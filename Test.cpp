@@ -33,7 +33,7 @@ TEST_CASE("Basic equals") {
         CHECK(Fraction(-1, -2) == Fraction(1, 2));
         CHECK(Fraction(-1, 2) != Fraction(1, 2));
         CHECK(Fraction(1, -2) != Fraction(1, 2));
-        CHECK(Fraction(-1, -2) != Fraction(1, 2));
+        CHECK(Fraction(-1, -2) == Fraction(1, 2));
         CHECK(Fraction(-1, 2) < Fraction(1, 2));
         CHECK(Fraction(1, -2) < Fraction(1, 2));
         CHECK(Fraction(-1, 2) <= Fraction(1, 2));
@@ -75,8 +75,9 @@ TEST_CASE("Check for reduced form"){
         CHECK(c+d == Fraction(1, 1));
         CHECK(c-d == Fraction(1, 4));
         Fraction e(6, 10);
-        CHECK(e++ == Fraction(8, 5));
-        CHECK(e-- == Fraction(-2, 5));
+        CHECK(++e == Fraction(8, 5));
+        CHECK(e-- == Fraction(8, 5));
+        CHECK(e == Fraction(3, 5));
     }
 }
 

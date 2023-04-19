@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 using namespace std;
 namespace ariel
@@ -12,94 +13,125 @@ namespace ariel
     class Fraction
     {
         private:
-            int numerator;
-            int denominator;
+
+            float numerator;
+            float denominator;
 
         public:
-            Fraction(double numerator, double denominator);
-            Fraction(double numerator);
+
+            // Constructors and destructors
+            Fraction(float numerator, float denominator);
+            Fraction(float numerator);
             Fraction(Fraction const& other);
             Fraction();
             Fraction(Fraction&& other) noexcept; // move constructor
             ~Fraction() = default;
+
+            // Operators for equlity (=)
             Fraction& operator=(Fraction&& other) noexcept; // move assignment operator
             Fraction& operator=(const Fraction& other);
-            Fraction& operator=(double other);
+            Fraction& operator=(float other);
+
+            // Operators for addition (+)
             Fraction operator+(const Fraction& other) const;
-            Fraction operator+(double other);
-            Fraction operator-(const Fraction& other) const;
-            Fraction operator-(double other);
-            Fraction operator*(const Fraction& other) const;
-            Fraction operator*(double other);
-            Fraction operator/(const Fraction& other) const;
-            Fraction operator/(double other);
-            bool operator==(const Fraction& other) const;
-            bool operator==(double other);
-            bool operator!=(const Fraction& other) const;
-            bool operator!=(double other);
-            bool operator>(const Fraction& other) const;
-            bool operator>(double other);
-            bool operator<(const Fraction& other) const;
-            bool operator<(double other);
-            bool operator>=(const Fraction& other) const;
-            bool operator>=(double other);
-            bool operator<=(const Fraction& other) const;
-            bool operator<=(double other);
+            Fraction operator+(float other);
             Fraction& operator++(); 
+            const Fraction operator++(int); 
+            friend Fraction operator+(float other, const Fraction& fraction){
+                float numerator = other * fraction.getDenominator() + fraction.getNumerator();
+                float denominator = fraction.getDenominator();
+                return Fraction(numerator, denominator);
+            }
+
+            // Operators for subtraction (-)
+            Fraction operator-(const Fraction& other) const;
+            Fraction operator-(float other);
             Fraction& operator--();
-            Fraction operator++(int); 
-            Fraction operator--(int);
-            operator std::string() const;
-
-            // the friend variable lets the function access the private variables of the class
-            friend std::ostream& operator<<(std::ostream& ostrm, const Fraction& fraction) {
-                return ostrm;
+            const Fraction operator--(int);
+            friend Fraction operator-(float other, const Fraction& fraction){
+                float numerator = other * fraction.getDenominator() - fraction.getNumerator();
+                float denominator = fraction.getDenominator();
+                return Fraction(numerator, denominator);
             }
 
-            friend istream& operator>>(istream& istrm, Fraction& fraction){
-                return istrm;
-            }
-
-            friend Fraction operator+(double other, const Fraction& fraction){
-                return Fraction(1,1);
-            }
-
-            friend Fraction operator-(double other, const Fraction& fraction){
-                return Fraction(1,1);
-            }
-
-            friend ariel::Fraction operator*(double value, const ariel::Fraction& fraction) {
-                return Fraction{1,1};
+            // Operators for multiplication (*)
+            Fraction operator*(const Fraction& other) const;
+            Fraction operator*(float other);
+            friend ariel::Fraction operator*(float other, const ariel::Fraction& fraction) {
+                return Fraction(other * fraction.getNumerator(), fraction.getDenominator());
             }   
 
-            friend Fraction operator/(double other, const Fraction& fraction){
-                return Fraction(1,1);
+            // Operators for division (/)
+            Fraction operator/(const Fraction& other) const;
+            Fraction operator/(float other);
+            friend Fraction operator/(float other, const Fraction& fraction){
+                return Fraction(other * fraction.getDenominator(), fraction.getNumerator());
             }
 
-            friend bool operator==(double other, const Fraction& fraction){
-                return true;
+            // Operators for equality-checking (==, !=)
+            bool operator==(const Fraction& other) const;
+            bool operator==(float other);
+            friend bool operator==(float other, const Fraction& fraction){
+                float val = fraction.tofloat();
+                return other == val;
             }
 
-            friend bool operator!=(double other, const Fraction& fraction){
-                return true;
+            bool operator!=(const Fraction& other) const;
+            bool operator!=(float other);
+            friend bool operator!=(float other, const Fraction& fraction){
+                float val = fraction.tofloat();
+                return other != val;
             }
 
-            friend bool operator>(double other, const Fraction& fraction){
-                return true;
+            // Operators for inequality (>, <, >=, <=)
+            bool operator>(const Fraction& other) const;
+            bool operator>(float other);
+            friend bool operator>(float other, const Fraction& fraction){
+                float val = fraction.tofloat();
+                return other > val;
+            }
+            bool operator<(const Fraction& other) const;
+            bool operator<(float other);
+            friend bool operator<(float other, const Fraction& fraction){
+                float val = fraction.tofloat();
+                return other < val;
+            }
+            bool operator>=(const Fraction& other) const;
+            bool operator>=(float other);
+             friend bool operator>=(float other, const Fraction& fraction){
+                 float val = fraction.tofloat();
+                return other >= val;
+            }
+            bool operator<=(const Fraction& other) const;
+            bool operator<=(float other);
+            friend bool operator<=(float other, const Fraction& fraction){
+                 float val = fraction.tofloat();
+                return other <= val;
             }
 
-            friend bool operator<(double other, const Fraction& fraction){
-                return true;
-            }
+            // To string
+            operator std::string() const;
 
-            friend bool operator>=(double other, const Fraction& fraction){
-                return true;
-            }
 
-            friend bool operator<=(double other, const Fraction& fraction){
-                return true;
+           // Stream operators
+            friend std::ostream& operator<<(std::ostream& ostrm, const Fraction& fraction) {
+                ostrm << fraction.numerator << "/" << fraction.denominator;
+                return ostrm;
             }
+            friend istream& operator>>(istream& istrm, Fraction& fraction){
+                int num, denom;
+                char slash;
+                istrm >> num >> slash >> denom;
 
+                if (istrm.good()) {
+                    if (slash != '/') {
+                        throw invalid_argument("Invalid input");
+                    } else {
+                        fraction = Fraction(num, denom);
+                    }
+                }
+                return istrm;
+            }
 
             // getters
 
@@ -111,6 +143,35 @@ namespace ariel
                 return denominator;
             }
 
+
+            // Other methods
+
+            static int gcd(int a, int b){
+                if (a == 0) return b;
+                return gcd(b % a, a);
+                
+            }
+
+            static void reduce(float& numerator, float& denominator){
+                int min = numerator < denominator ? numerator : denominator;
+                int gcd = Fraction::gcd(numerator, denominator);
+                numerator /= gcd;
+                denominator /= gcd;
+            }
+
+            // Fraction floatToFraction(float value);
+            
+            float tofloat() const{
+                return numerator / denominator;
+            }
+
+            // operator double () const{
+            //     return tofloat();
+            // }
+
+            // operator float () const{
+            //     return tofloat();
+            // }
     };
 
 }
