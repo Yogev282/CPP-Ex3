@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <stdexcept>
+#include <unistd.h>
 
 using namespace std;
 namespace ariel
@@ -35,6 +37,8 @@ namespace ariel
             // Operators for addition (+)
             Fraction operator+(const Fraction& other) const;
             Fraction operator+(float other);
+            Fraction operator+=(const Fraction& other);
+            Fraction operator+=(float other);
             Fraction& operator++(); 
             const Fraction operator++(int); 
             friend Fraction operator+(float other, const Fraction& fraction){
@@ -46,17 +50,20 @@ namespace ariel
             // Operators for subtraction (-)
             Fraction operator-(const Fraction& other) const;
             Fraction operator-(float other);
+            Fraction operator-=(const Fraction& other);
+            Fraction operator-=(float other);
             Fraction& operator--();
             const Fraction operator--(int);
             friend Fraction operator-(float other, const Fraction& fraction){
-                float numerator = other * fraction.getDenominator() - fraction.getNumerator();
-                float denominator = fraction.getDenominator();
-                return Fraction(numerator, denominator);
+                
+                return Fraction(other * fraction.getDenominator() - fraction.getNumerator(), fraction.getDenominator());
             }
 
             // Operators for multiplication (*)
             Fraction operator*(const Fraction& other) const;
             Fraction operator*(float other);
+            Fraction operator*=(const Fraction& other);
+            Fraction operator*=(float other);
             friend ariel::Fraction operator*(float other, const ariel::Fraction& fraction) {
                 return Fraction(other * fraction.getNumerator(), fraction.getDenominator());
             }   
@@ -64,6 +71,8 @@ namespace ariel
             // Operators for division (/)
             Fraction operator/(const Fraction& other) const;
             Fraction operator/(float other);
+            Fraction operator/=(const Fraction& other);
+            Fraction operator/=(float other);
             friend Fraction operator/(float other, const Fraction& fraction){
                 return Fraction(other * fraction.getDenominator(), fraction.getNumerator());
             }
@@ -146,32 +155,26 @@ namespace ariel
 
             // Other methods
 
-            static int gcd(int a, int b){
-                if (a == 0) return b;
-                return gcd(b % a, a);
-                
-            }
-
+            
             static void reduce(float& numerator, float& denominator){
                 int min = numerator < denominator ? numerator : denominator;
-                int gcd = Fraction::gcd(numerator, denominator);
+                // cout << "numerator: " << numerator << " denominator: " << denominator << " min: " << min << endl;
+                float gcd = 1;
+                for(int i = 2; i <= min; i++){
+                    if((int)round(numerator) % i == 0 && (int)round(denominator) % i == 0){
+                        gcd = i;
+                    }
+                }
+   
+                gcd = round(gcd);
                 numerator /= gcd;
                 denominator /= gcd;
             }
-
-            // Fraction floatToFraction(float value);
             
             float tofloat() const{
                 return numerator / denominator;
             }
 
-            // operator double () const{
-            //     return tofloat();
-            // }
-
-            // operator float () const{
-            //     return tofloat();
-            // }
     };
 
 }

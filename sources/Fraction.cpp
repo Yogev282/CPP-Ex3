@@ -18,7 +18,7 @@ Fraction :: Fraction(float numerator, float denominator)
     float num = numerator;
     float denom = denominator;
 
-    while((num != round(num)) || (denom != round(denom)))
+    while(((num != (round(num))) || (denom != round(denom))) && denom < 1000)
     {
         num *= 10;
         denom *= 10;
@@ -45,6 +45,10 @@ Fraction :: Fraction(float numerator)
 
 Fraction :: Fraction(Fraction const& other)
 {
+    if(this == &other)
+    {
+        return;
+    }
     this->numerator = other.getNumerator();
     this->denominator = other.getDenominator();
 };
@@ -57,6 +61,10 @@ Fraction :: Fraction()
 
 Fraction :: Fraction(Fraction&& other) noexcept
 {
+    if(this == &other)
+    {
+        return;
+    }
     this->numerator = other.getNumerator();
     this->denominator = other.getDenominator();
 };
@@ -110,6 +118,18 @@ Fraction Fraction :: operator+(float other)
     return *this + Fraction(other);
 };
 
+Fraction Fraction :: operator+=(const Fraction& other)
+{
+    *this = *this + other;
+    return *this;
+};
+
+Fraction Fraction :: operator+=(float other)
+{
+    *this = *this + other;
+    return *this;
+};
+
 Fraction& Fraction :: operator++()
 {
     this->numerator += this->denominator;
@@ -139,6 +159,18 @@ Fraction Fraction :: operator-(float other)
     return *this - Fraction(other);
 };
 
+Fraction Fraction :: operator-=(const Fraction& other)
+{
+    *this = *this - other;
+    return *this;
+};
+
+Fraction Fraction :: operator-=(float other)
+{
+    *this = *this - other;
+    return *this;
+};
+
 Fraction& Fraction :: operator--()
 {
     this->numerator -= this->denominator;
@@ -166,6 +198,16 @@ Fraction Fraction :: operator*(float other)
     return *this  * Fraction(other);
 };
 
+Fraction Fraction :: operator *=(const Fraction& other){
+    *this = *this * other;
+    return *this;
+}
+
+Fraction Fraction :: operator *=(float other){
+    *this = *this * other;
+    return *this;
+}
+
 
 // ********** Operators for division (/) **********
 Fraction Fraction :: operator/(const Fraction& other) const
@@ -177,6 +219,18 @@ Fraction Fraction :: operator/(const Fraction& other) const
 Fraction Fraction :: operator/(float other)
 {
     return *this / Fraction(other);
+};
+
+Fraction Fraction :: operator/=(const Fraction& other)
+{
+    *this = *this / other;
+    return *this;
+};
+
+Fraction Fraction :: operator/=(float other)
+{
+    *this = *this / other;
+    return *this;
 };
 
 // ********** Operators for equality-checking (==, !=) **********

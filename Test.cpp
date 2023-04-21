@@ -91,5 +91,120 @@ TEST_CASE("Output not throw"){
 }
 
 
+TEST_CASE(" check every operator"){
+    SUBCASE("(=)"){
+        Fraction tmp(3, 7);
+        Fraction a;
+        a = tmp;
+        CHECK(a == tmp);
+        a = 2.5;
+        Fraction b(5, 2);
+        CHECK(b == a);
+    };
+
+    SUBCASE("(+)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(5, 6);
+        CHECK(a+b == c);
+        CHECK(a+2.371 == Fraction(2871, 1000));
+        CHECK(2.371+a == Fraction(2871, 1000));
+        Fraction d = 2.371;
+        CHECK(d+a == Fraction(2871, 1000));
+    };
+
+    SUBCASE("(-)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(1, 6);
+        CHECK(a-b == c);
+        CHECK(a-2.393 == Fraction(-1893, 1000));
+        CHECK(2.392-a == Fraction(473, 250));
+        Fraction d = 2.393;
+        CHECK(d-a == Fraction(1893, 1000));
+    };
+
+    SUBCASE("(*)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(1, 6);
+        CHECK(a*b == c);
+        CHECK(a*7.491 == Fraction(7491, 2000));
+        CHECK(7.491*a == Fraction(7491, 2000));
+        Fraction d = 7.491;
+        CHECK(a*d == Fraction(7491, 2000));
+        
+    };
+
+    SUBCASE("(/)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(3, 2);
+        CHECK(a/b == c);
+        CHECK(a/6.661 == Fraction(500, 6661));
+        CHECK(6.661/a == Fraction(6661, 500));
+        Fraction d = 6.661;
+        CHECK(d/a == Fraction(6661, 500));
+        
+    };
+
+    SUBCASE("(++)"){
+        Fraction a(1, 2);
+        Fraction b(3, 2);
+        Fraction c(3,-2);
+        CHECK(++a == b);
+        CHECK(a-- == b);
+        CHECK(----a == c);
+    };
+
+    SUBCASE("(--)"){
+        Fraction a(1, 2);
+        Fraction b(1, 2);
+        Fraction c(-1, 2);
+        Fraction d(5, 2);
+        CHECK(--a == c);
+        CHECK(a++ == c);
+        CHECK(++++a == d);
+    };
+
+    SUBCASE("(+=)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(5, 6);
+        CHECK((a+=b) == c);
+        CHECK(a == c);
+        CHECK((a+=2.371) == Fraction(9613, 3000));
+    };
+
+    SUBCASE("(-=)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(1, 6);
+        CHECK((a-=b) == c);
+        CHECK(a == c);
+        CHECK((a-=2.393) == Fraction(-6679, 3000));
+    };
+
+    SUBCASE("(*=)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(1, 6);
+        CHECK((a*=b) == c);
+        CHECK(a == c);
+        CHECK((a*=7.491) == Fraction(2497, 2000));
+    };
+
+    SUBCASE("(/=)"){
+        Fraction a(1, 2);
+        Fraction b(1, 3);
+        Fraction c(3, 2);
+        CHECK((a/=b) == c);
+        CHECK(a == c);
+        CHECK((a/=6.661) == Fraction(1500, 6661));
+    };
+
+
+}
+
 
 
