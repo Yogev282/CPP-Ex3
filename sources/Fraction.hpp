@@ -42,8 +42,8 @@ namespace ariel
             Fraction& operator++(); 
             const Fraction operator++(int); 
             friend Fraction operator+(float other, const Fraction& fraction){
-                float numerator = other * fraction.getDenominator() + fraction.getNumerator();
-                float denominator = fraction.getDenominator();
+                float numerator = other * (float)fraction.getDenominator() + (float)fraction.getNumerator();
+                float denominator = (float)fraction.getDenominator();
                 return Fraction(numerator, denominator);
             }
 
@@ -128,27 +128,29 @@ namespace ariel
                 return ostrm;
             }
             friend istream& operator>>(istream& istrm, Fraction& fraction){
-                int num, denom;
-                char slash;
+                float num = 0;
+                float denom = 0;
+                char slash = 0;
                 istrm >> num >> slash >> denom;
 
                 if (istrm.good()) {
                     if (slash != '/') {
                         throw invalid_argument("Invalid input");
-                    } else {
-                        fraction = Fraction(num, denom);
-                    }
+                    } 
+
+                    fraction = Fraction(num, denom);
+                    
                 }
                 return istrm;
             }
 
             // getters
 
-            int getNumerator() const {
+            float getNumerator() const {
                 return numerator;
             }
 
-            int getDenominator() const {
+            float getDenominator() const {
                 return denominator;
             }
 
@@ -157,12 +159,12 @@ namespace ariel
 
             
             static void reduce(float& numerator, float& denominator){
-                int min = numerator < denominator ? numerator : denominator;
+                float min = numerator < denominator ? numerator : denominator;
                 // cout << "numerator: " << numerator << " denominator: " << denominator << " min: " << min << endl;
                 float gcd = 1;
-                for(int i = 2; i <= min; i++){
+                for(int i = 2; (float)i <= min; i++){
                     if((int)round(numerator) % i == 0 && (int)round(denominator) % i == 0){
-                        gcd = i;
+                        gcd = (float)i;
                     }
                 }
    
