@@ -7,22 +7,27 @@
 #include <math.h>
 #include <stdexcept>
 #include <unistd.h>
+#include <numeric>
+#include <limits>
+#include <algorithm>
 
 using namespace std;
 namespace ariel
 {
 
+    float const devider = 1000;
+
     class Fraction
     {
         private:
 
-            float numerator;
-            float denominator;
+            int numerator;
+            int denominator;
 
         public:
 
             // Constructors and destructors
-            Fraction(float numerator, float denominator);
+            Fraction(int numerator, int denominator);
             Fraction(float numerator);
             Fraction(Fraction const& other);
             Fraction();
@@ -42,9 +47,10 @@ namespace ariel
             Fraction& operator++(); 
             const Fraction operator++(int); 
             friend Fraction operator+(float other, const Fraction& fraction){
-                float numerator = other * (float)fraction.getDenominator() + (float)fraction.getNumerator();
-                float denominator = (float)fraction.getDenominator();
-                return Fraction(numerator, denominator);
+                float tmp1 = round(other * devider) / devider;
+                float tmp2 = round(fraction.tofloat() * devider) / devider;
+                Fraction tmp(tmp1 + tmp2);
+                return tmp;
             }
 
             // Operators for subtraction (-)
@@ -55,8 +61,10 @@ namespace ariel
             Fraction& operator--();
             const Fraction operator--(int);
             friend Fraction operator-(float other, const Fraction& fraction){
-                
-                return Fraction(other * fraction.getDenominator() - fraction.getNumerator(), fraction.getDenominator());
+                float tmp1 = round(other * devider) / devider;
+                float tmp2 = round(fraction.tofloat() * devider) / devider;
+                Fraction tmp(tmp1 - tmp2);
+                return tmp;
             }
 
             // Operators for multiplication (*)
@@ -65,7 +73,8 @@ namespace ariel
             Fraction operator*=(const Fraction& other);
             Fraction operator*=(float other);
             friend ariel::Fraction operator*(float other, const ariel::Fraction& fraction) {
-                return Fraction(other * fraction.getNumerator(), fraction.getDenominator());
+                Fraction tmp(other);
+                return tmp * fraction;
             }   
 
             // Operators for division (/)
@@ -74,7 +83,11 @@ namespace ariel
             Fraction operator/=(const Fraction& other);
             Fraction operator/=(float other);
             friend Fraction operator/(float other, const Fraction& fraction){
-                return Fraction(other * fraction.getDenominator(), fraction.getNumerator());
+                if(fraction.tofloat() == 0){
+                    throw std::runtime_error("Can't divide by zero");
+                }
+                Fraction tmp(other);
+                return tmp / fraction;
             }
 
             // Operators for equality-checking (==, !=)
@@ -124,33 +137,49 @@ namespace ariel
 
            // Stream operators
             friend std::ostream& operator<<(std::ostream& ostrm, const Fraction& fraction) {
-                ostrm << fraction.numerator << "/" << fraction.denominator;
+                int num = fraction.getNumerator();
+                int denom = fraction.getDenominator();
+                if(num > 0 && denom < 0 || num < 0 && denom < 0)
+                {
+                    num *= -1;
+                    denom *= -1;
+                }
+                
+                ostrm << num << "/" << denom;
                 return ostrm;
             }
+
             friend istream& operator>>(istream& istrm, Fraction& fraction){
-                float num = 0;
-                float denom = 0;
+                int numerator = 0;
+                int denominator = 1;
                 char slash = 0;
-                istrm >> num >> slash >> denom;
-
-                if (istrm.good()) {
-                    if (slash != '/') {
-                        throw invalid_argument("Invalid input");
-                    } 
-
-                    fraction = Fraction(num, denom);
-                    
+                istrm >> numerator;
+                if (istrm.fail() || denominator == 0) {
+                    throw std::runtime_error("Invalid input");
                 }
+                if (istrm.peek() == '/') {
+                    istrm >> slash >> denominator;
+                    if (istrm.fail() || denominator == 0) {
+                        throw std::runtime_error("Invalid input");
+                    }
+                }
+                else {
+                    istrm>>denominator;
+                    if (istrm.fail() || denominator == 0) {
+                        throw std::runtime_error("Invalid input");
+                    }
+                }
+                fraction = Fraction(numerator, denominator);
                 return istrm;
             }
 
             // getters
 
-            float getNumerator() const {
+            int getNumerator() const {
                 return numerator;
             }
 
-            float getDenominator() const {
+            int getDenominator() const {
                 return denominator;
             }
 
@@ -158,23 +187,33 @@ namespace ariel
             // Other methods
 
             
-            static void reduce(float& numerator, float& denominator){
-                float min = numerator < denominator ? numerator : denominator;
-                // cout << "numerator: " << numerator << " denominator: " << denominator << " min: " << min << endl;
-                float gcd = 1;
-                for(int i = 2; (float)i <= min; i++){
-                    if((int)round(numerator) % i == 0 && (int)round(denominator) % i == 0){
-                        gcd = (float)i;
-                    }
+            static void reduce(int& numerator, int& denominator){
+                bool nflag = false;
+                bool dflag = false;
+                if(numerator < 0){
+                    numerator *= -1;
+                    nflag = true;
                 }
-   
-                gcd = round(gcd);
+                if(denominator < 0){
+                    denominator *= -1;
+                    dflag = true;
+                }
+                
+                int gcd = __gcd(numerator, denominator);
+
+                if(nflag){
+                    numerator *= -1;
+                }
+                if(dflag){
+                    denominator *= -1;
+                }
+                
                 numerator /= gcd;
                 denominator /= gcd;
             }
             
             float tofloat() const{
-                return numerator / denominator;
+                return (float)numerator / (float)denominator;
             }
 
     };
